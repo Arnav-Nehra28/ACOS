@@ -182,22 +182,6 @@ flowchart TD
     PROM --> GRAF[Grafana]
 ```
 
-### Deployment Architecture (Kubernetes)
-
-```mermaid
-%%{init: {"flowchart":{"nodeSpacing":40,"rankSpacing":55},"themeVariables":{"fontSize":"14px"}}}%%
-flowchart LR
-    subgraph K8S["Local Kubernetes Cluster"]
-      direction LR
-      KUI[acos-frontend<br/>Deployment + Service]
-      KAGENT[acos-api<br/>Deployment + Service]
-      KPROM[prometheus<br/>Deployment + Service]
-      KGRAF[grafana<br/>Deployment + Service]
-    end
-    KUI --> KAGENT
-    KAGENT --> KPROM
-    KPROM --> KGRAF
-```
 
 ---
 
@@ -677,12 +661,3 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 MIT License · Copyright (c) 2026 Arnav
 ```
 
----
-
-<div align="center">
-
-**Built with ❤️ by Arnav**
-
-[⬆ Back to Top](#-acos--automative-cognitive-orchestration-system)
-
-</div>
