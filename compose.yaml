@@ -1,0 +1,75 @@
+services:
+  acos_api:
+    container_name: acos-api
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.service
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+    develop:
+      watch:
+        - path: acos_core/
+          action: sync+restart
+          target: /app/acos_core/
+        - path: acos_models/
+          action: sync+restart
+          target: /app/acos_models/
+        - path: acos_api/
+          action: sync+restart
+          target: /app/acos_api/
+
+  acos_frontend:
+    container_name: acos-frontend
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.app
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env
+    depends_on:
+      - acos_api
+    environment:
+      - AGENT_URL=http://acos_api:8000
+    develop:
+      watch:
+        - path: acos_client/
+          action: sync+restart
+          target: /app/acos_client/
+        - path: acos_models/
+          action: sync+restart
+          target: /app/acos_models/
+        - path: streamlit_app.py
+          action: sync+restart
+          target: /app/streamlit_app.py
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    ports:
+      - "9090:9090"
+    depends_on:
+      - acos_api
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana-oss:11.2.0
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    restart: unless-stopped
+
+volumes:
+  grafana_data:
