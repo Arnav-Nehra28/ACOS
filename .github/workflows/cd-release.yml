@@ -56,8 +56,8 @@ jobs:
           file: docker/Dockerfile.service
           push: true
           tags: |
-            ${{ steps.tags.outputs.namespace }}/multi-agent-orchestration-service:${{ steps.tags.outputs.version }}
-            ${{ steps.tags.outputs.namespace }}/multi-agent-orchestration-service:latest
+            ${{ steps.tags.outputs.namespace }}/acos-api:${{ steps.tags.outputs.version }}
+            ${{ steps.tags.outputs.namespace }}/acos-api:latest
 
       - name: Build and push app image
         uses: docker/build-push-action@v6
@@ -66,5 +66,5 @@ jobs:
           file: docker/Dockerfile.app
           push: true
           tags: |
-            ${{ steps.tags.outputs.namespace }}/multi-agent-orchestration-app:${{ steps.tags.outputs.version }}
-            ${{ steps.tags.outputs.namespace }}/multi-agent-orchestration-app:latest
+            ${{ steps.tags.outputs.namespace }}/acos-frontend:${{ steps.tags.outputs.version }}
+            ${{ steps.tags.outputs.namespace }}/acos-frontend:latest

@@ -54,7 +54,7 @@ jobs:
           LOCAL_RAG_DB_PATH: data/rag/local_rag_ci.db
           ENABLE_USER_AUTH: "true"
           USER_AUTH_SECRET: ci-user-auth-secret
-        run: pytest -q service/test_service.py schema/test_schema.py
+        run: pytest -q acos_api/test_service.py acos_models/test_schema.py
 
   docker-build-check:
     name: Docker Build Check
@@ -66,7 +66,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build service image
-        run: docker build -f docker/Dockerfile.service -t multi-agent-orchestration-service:ci .
+        run: docker build -f docker/Dockerfile.service -t acos-api:ci .
 
       - name: Build app image
-        run: docker build -f docker/Dockerfile.app -t multi-agent-orchestration-app:ci .
+        run: docker build -f docker/Dockerfile.app -t acos-frontend:ci .
