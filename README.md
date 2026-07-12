@@ -209,7 +209,7 @@ flowchart TD
     END --> HITLDB[Persist HITL decision]
     HITLDB --> HITL[hitl_events]
 
-    API --> METRICS[/healthz · /readyz · /metrics]
+    API --> METRICS["/healthz · /readyz · /metrics"]
     METRICS --> PROM[Prometheus]
     PROM --> GRAF[Grafana]
 ```
