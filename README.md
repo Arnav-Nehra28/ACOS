@@ -2,7 +2,7 @@
 
 # 🧠 ACOS — Automative Cognitive Orchestration System
 
-**A production-grade, supervisor-routed multi-agent AI platform built with LangGraph, FastAPI, and Streamlit.**
+**A production-grade, supervisor-routed multi-agent AI platform built with LangGraph, FastAPI, and Vanilla JS.**
 
 [![CI](https://github.com/Arnav-Nehra28/ACOS/actions/workflows/ci.yml/badge.svg)](https://github.com/Arnav-Nehra28/ACOS/actions/workflows/ci.yml)
 [![CD](https://github.com/Arnav-Nehra28/ACOS/actions/workflows/cd-release.yml/badge.svg)](https://github.com/Arnav-Nehra28/ACOS/actions/workflows/cd-release.yml)
@@ -20,6 +20,38 @@
 <br/>
 
 <img src="media/agent_architecture.png" alt="ACOS Architecture" width="780"/>
+
+```mermaid
+flowchart LR
+    subgraph Frontend [ACOS Workspace]
+        direction TB
+        UI[Vanilla HTML/JS UI]
+        Client[Agent Client]
+        UI <--> Client
+    end
+
+    subgraph Backend [FastAPI Service]
+        direction TB
+        API[FastAPI Endpoints]
+        subgraph Orchestrator [LangGraph Multi-Agent System]
+            direction TB
+            Router(Intent Router)
+            Web(Web Search Agent)
+            RAG(Local RAG Agent)
+            Math(Math Agent)
+            Router --> Web
+            Router --> RAG
+            Router --> Math
+        end
+        API <--> Orchestrator
+    end
+
+    User((End User)) -->|Interacts| UI
+    Client -->|POST /stream| API
+    API -->|SSE stream| Client
+
+    Orchestrator <-->|API Calls| LLM[Groq Llama 3.3 / OpenAI]
+```
 
 </div>
 
@@ -58,7 +90,7 @@ The system is designed with enterprise-grade concerns in mind: per-user authenti
 |---|---|
 | **Multi-Agent Assistants** | Supervisor-routed agents that handle safety, retrieval, reasoning, and response generation |
 | **Agentic RAG Systems** | Hybrid retrieval combining vector search, BM25 lexical matching, and LLM-based reranking |
-| **Real-Time Chat Services** | FastAPI backend with SSE streaming + interactive Streamlit frontend |
+| **Real-Time Chat Services** | FastAPI backend serving a lightweight Vanilla JS frontend with SSE streaming |
 | **Knowledge Graph Reasoning** | NetworkX-powered relationship extraction and entity-linking over local documentation |
 | **Tool-Augmented Agents** | MCP tool bridge for `web_search` and `calculator` with automatic local fallbacks |
 
@@ -122,7 +154,7 @@ The system is designed with enterprise-grade concerns in mind: per-user authenti
 ```mermaid
 %%{init: {"flowchart":{"nodeSpacing":45,"rankSpacing":65},"themeVariables":{"fontSize":"14px"}}}%%
 flowchart TD
-    U[User in Streamlit] --> AUTH[Login / Register]
+    U[User in Workspace] --> API[FastAPI /stream]
     AUTH --> HIST[Load conversation history]
     HIST --> Q[User sends message]
     Q --> API[FastAPI /invoke or /stream]
@@ -171,7 +203,7 @@ flowchart TD
 
     RESP --> EVA
     EVA --> END[Graph END]
-    END --> APIRESP[Return to Streamlit]
+    END --> APIRESP[Return to Workspace]
     APIRESP --> STOREA[Store AI message]
     STOREA --> CST[conversation_store]
     END --> HITLDB[Persist HITL decision]
@@ -254,7 +286,7 @@ acos-orchestrator/
 ├── acos_client/                        # 📡 Client utilities
 │   └── client.py                       #    AgentClient (HTTP + SSE streaming)
 │
-├── streamlit_app.py                    # 🎨 Streamlit chat UI
+├── acos_frontend/                      # 🎨 Vanilla HTML/JS workspace UI
 ├── run_service.py                      #    Backend entry point
 ├── run_client.py                       #    CLI client entry point
 │
@@ -349,7 +381,7 @@ docker compose up -d --build
 
 | Service | URL | Notes |
 |---|---|---|
-| **Streamlit UI** | [http://localhost:8501](http://localhost:8501) | Register → Login → Chat |
+| **Workspace UI** | [http://localhost:8000](http://localhost:8000) | Chat Interface |
 | **FastAPI Backend** | [http://localhost:8000](http://localhost:8000) | REST API + SSE streaming |
 | **Prometheus** | [http://localhost:9090](http://localhost:9090) | Metrics dashboard |
 | **Grafana** | [http://localhost:3001](http://localhost:3001) | Visualization (admin/admin) |
@@ -597,7 +629,7 @@ For recency-sensitive web queries (e.g., "latest AI news this week"), ACOS imple
 
 1. `recency_guard_agent` detects temporal intent and extracts date constraints
 2. `web_hitl_gate_agent` fetches preview results and pauses graph execution
-3. The Streamlit UI renders **Approve / Reject** buttons (plain text also works: `approve` or `reject: <reason>`)
+3. The UI renders **Approve / Reject** buttons (plain text also works: `approve` or `reject: <reason>`)
 4. On approval → `web_search_agent` generates the full answer
 5. On rejection → `evaluation_agent` produces a follow-up message
 6. All decisions are persisted in the `hitl_events` audit table
