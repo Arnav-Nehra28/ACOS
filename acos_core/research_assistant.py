@@ -82,8 +82,8 @@ GRAPH_WEB_HITL_MAX_RESULTS = max(1, min(int(os.getenv("GRAPH_WEB_HITL_MAX_RESULT
 
 
 def _build_model(model_name: str) -> BaseChatModel:
-    if model_name == "llama-3.1-70b":
-        return ChatGroq(model="llama-3.1-70b-versatile", temperature=0.2)
+    if model_name == "llama-3.3-70b":
+        return ChatGroq(model="llama-3.3-70b-versatile", temperature=0.2)
     return ChatOpenAI(model="gpt-4o-mini", temperature=0.2, streaming=True)
 
 
@@ -105,8 +105,8 @@ def _get_model(config: RunnableConfig) -> BaseChatModel:
     model_name = config["configurable"].get("model", "gpt-4o-mini")
     # Fallback if requested provider key is missing in env.
     if model_name == "gpt-4o-mini" and not os.getenv("OPENAI_API_KEY") and os.getenv("GROQ_API_KEY"):
-        model_name = "llama-3.1-70b"
-    if model_name == "llama-3.1-70b" and not os.getenv("GROQ_API_KEY") and os.getenv("OPENAI_API_KEY"):
+        model_name = "llama-3.3-70b"
+    if model_name == "llama-3.3-70b" and not os.getenv("GROQ_API_KEY") and os.getenv("OPENAI_API_KEY"):
         model_name = "gpt-4o-mini"
 
     if model_name not in _model_cache:
@@ -150,7 +150,8 @@ def _looks_like_math(query: str) -> bool:
     q = (query or "").lower()
     if any(k in q for k in ["calculate", "math", "equation", "solve"]):
         return True
-    return bool(re.search(r"[\d\s\+\-\*/\(\)\.\^]{3,}", q))
+    # Require at least one digit, an operator, and another digit
+    return bool(re.search(r"\d+\s*[\+\-\*/\^]\s*\d+", q))
 
 
 def _extract_expression(query: str) -> str:

@@ -1,4 +1,5 @@
 import asyncio
+from pathlib import Path as _Path
 import base64
 from contextlib import AsyncExitStack, asynccontextmanager
 from datetime import datetime, timedelta, timezone
@@ -15,11 +16,17 @@ import time
 from typing import AsyncGenerator, Dict, Any, Tuple
 from uuid import uuid4
 from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.responses import StreamingResponse
 from dotenv import load_dotenv
 from langchain_core.callbacks import AsyncCallbackHandler
 from langchain_core.runnables import RunnableConfig
-from langgraph.checkpoint.aiosqlite import AsyncSqliteSaver
+try:
+    from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
+except ImportError:
+    from langgraph.checkpoint.aiosqlite import AsyncSqliteSaver
 from langgraph.graph.graph import CompiledGraph
 from langsmith import Client as LangsmithClient
 from prometheus_client import Counter, Histogram, CONTENT_TYPE_LATEST, generate_latest
@@ -386,6 +393,7 @@ def _validate_user_credentials(user_id: str, password: str) -> tuple[str, str]:
 
 def _is_public_route(path: str) -> bool:
     public_paths = {
+        "/",
         "/auth/register",
         "/auth/login",
         "/metrics",
@@ -398,6 +406,8 @@ def _is_public_route(path: str) -> bool:
     if path in public_paths:
         return True
     if path.startswith("/docs/"):
+        return True
+    if path.startswith("/app/"):
         return True
     return False
 
@@ -629,6 +639,29 @@ async def lifespan(app: FastAPI):
     # context managers are cleaned up by AsyncExitStack on exit
 
 app = FastAPI(lifespan=lifespan)
+
+# CORS for local dev
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ── Static frontend ──
+_FRONTEND_DIR = _Path(__file__).resolve().parent.parent / "acos_frontend"
+if _FRONTEND_DIR.is_dir():
+    app.mount("/app", StaticFiles(directory=str(_FRONTEND_DIR)), name="frontend_static")
+
+
+@app.get("/", include_in_schema=False)
+async def root_redirect():
+    """Serve the custom frontend on the root URL."""
+    index = _FRONTEND_DIR / "index.html"
+    if index.is_file():
+        return FileResponse(str(index), media_type="text/html")
+    return {"service": "ACOS API", "status": "running", "ui": "frontend not found"}
 
 
 @app.middleware("http")

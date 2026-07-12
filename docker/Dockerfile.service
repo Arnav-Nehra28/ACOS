@@ -9,6 +9,7 @@ RUN uv pip install --system --no-cache -r requirements.txt
 COPY acos_core/ ./acos_core/
 COPY acos_models/ ./acos_models/
 COPY acos_api/ ./acos_api/
+COPY acos_frontend/ ./acos_frontend/
 COPY run_service.py .
 
 CMD ["python", "run_service.py"]

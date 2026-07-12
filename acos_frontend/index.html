@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="ACOS — Automative Cognitive Orchestration System." />
+  <title>ACOS — Workspace</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>" />
+  <link rel="stylesheet" href="/app/index.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Main Workspace -->
+    <div id="chat-view" style="display:flex; width:100%; height:100%;">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-brand">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+            <span class="sidebar-brand-name">ACOS Workspace</span>
+          </div>
+          <button class="new-chat-btn" id="new-chat-btn">+ New Conversation</button>
+        </div>
+        <div class="sidebar-threads" id="thread-list">
+          <!-- Threads go here -->
+        </div>
+        <div class="sidebar-footer">
+          <span id="user-display-name">Local Session</span>
+        </div>
+      </aside>
+
+      <!-- Main Area -->
+      <main class="main">
+        <div class="main-header">
+          <span class="main-header-title" id="chat-header-title">New Conversation</span>
+          <select class="model-select" id="model-select">
+            <!-- Models populated by JS -->
+          </select>
+        </div>
+
+        <div class="messages" id="chat-messages">
+          <!-- Messages or welcome screen injected here -->
+        </div>
+
+        <div class="input-wrap">
+          <div class="input-inner">
+            <textarea
+              class="input-box"
+              id="chat-input"
+              placeholder="Ask the agents to research, calculate, or retrieve..."
+              rows="1"
+            ></textarea>
+            <button class="send-btn" id="send-btn" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked@14.0.0/marked.min.js"></script>
+  <script src="/app/app.js"></script>
+</body>
+</html>

@@ -11,6 +11,8 @@ services:
     environment:
       - HOST=0.0.0.0
       - PORT=8000
+      - ENABLE_USER_AUTH=false
+      - AUTH_SECRET=
     develop:
       watch:
         - path: acos_core/
@@ -22,31 +24,6 @@ services:
         - path: acos_api/
           action: sync+restart
           target: /app/acos_api/
-
-  acos_frontend:
-    container_name: acos-frontend
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.app
-    ports:
-      - "8501:8501"
-    env_file:
-      - .env
-    depends_on:
-      - acos_api
-    environment:
-      - AGENT_URL=http://acos_api:8000
-    develop:
-      watch:
-        - path: acos_client/
-          action: sync+restart
-          target: /app/acos_client/
-        - path: acos_models/
-          action: sync+restart
-          target: /app/acos_models/
-        - path: streamlit_app.py
-          action: sync+restart
-          target: /app/streamlit_app.py
 
   prometheus:
     image: prom/prometheus:v2.54.1
