@@ -59,12 +59,3 @@ jobs:
             ${{ steps.tags.outputs.namespace }}/acos-api:${{ steps.tags.outputs.version }}
             ${{ steps.tags.outputs.namespace }}/acos-api:latest
 
-      - name: Build and push app image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: docker/Dockerfile.app
-          push: true
-          tags: |
-            ${{ steps.tags.outputs.namespace }}/acos-frontend:${{ steps.tags.outputs.version }}
-            ${{ steps.tags.outputs.namespace }}/acos-frontend:latest
