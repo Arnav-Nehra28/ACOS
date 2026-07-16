@@ -659,6 +659,21 @@ Triggers on every `push` and `pull_request` to `main`:
 1. **Python Tests** — runs `pytest` against `acos_api/test_service.py` and `acos_models/test_schema.py`
 2. **Docker Build Check** — verifies both `Dockerfile.service` and `Dockerfile.app` build successfully
 
+### Running Tests Locally
+
+To run the test suite locally, ensure your environment is set up with both requirement files:
+
+```bash
+python -m venv test-env
+source test-env/bin/activate
+pip install -r requirements.txt -r test-requirements.txt
+
+# Run pytest
+pytest acos_api/test_service.py acos_models/test_schema.py
+```
+
+> **Note**: `test-requirements.txt` strictly pins `httpx==0.27.2`. This is required to resolve a dependency conflict where `chromadb` needs `httpx>=0.27.0`, but the older `FastAPI < 0.100.0` version uses a `TestClient` that is incompatible with `httpx>=0.28.0`.
+
 ### Continuous Deployment (`cd-release.yml`)
 
 Triggers on version tags (`v*`) or manual dispatch:
