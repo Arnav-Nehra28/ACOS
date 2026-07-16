@@ -59,7 +59,7 @@ def test_invoke():
     assert output.content == ANSWER
 
 
-@patch("service.service.LangsmithClient")
+@patch("acos_api.service.LangsmithClient")
 def test_feedback(mock_client):
     ls_instance = mock_client.return_value
     ls_instance.create_feedback.return_value = None
@@ -139,7 +139,7 @@ def test_store_threads_are_isolated_by_user():
     assert "thread-b-1" in ids_b
 
 
-@patch("service.service.perform_web_search")
+@patch("acos_api.service.perform_web_search")
 def test_web_search_preview_endpoint(mock_web_search):
     mock_web_search.return_value = (
         "- Example AI News\n"
